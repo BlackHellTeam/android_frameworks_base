@@ -354,6 +354,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     private boolean mShowCarrierInPanel = false;
 
+    // crDroid logo
+    private boolean mCrdroidLogo;
+    private ImageView crdroidLogo;
+
     // position
     int[] mPositionTmp = new int[2];
     boolean mExpandedVisible;
@@ -464,6 +468,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.RECENTS_LONG_PRESS_ACTIVITY), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_CRDROID_LOGO), false, this,
+                    UserHandle.USER_ALL);
             update();
         }
 
@@ -552,6 +559,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
             // This method reads Settings.Secure.RECENTS_LONG_PRESS_ACTIVITY
             updateCustomRecentsLongPressHandler(false);
+
+            mCrdroidLogo = Settings.System.getIntForUser(resolver,
+                    Settings.System.STATUS_BAR_CRDROID_LOGO, 0, mCurrentUserId) == 1;
+            showCrdroidLogo(mCrdroidLogo);
         }
     }
 
@@ -3659,6 +3670,15 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             }
         }
     };
+
+    public void showCrdroidLogo(boolean show) {
+        if (mStatusBarView == null) return;
+        ContentResolver resolver = mContext.getContentResolver();
+        crdroidLogo = (ImageView) mStatusBarView.findViewById(R.id.crdroid_logo);
+        if (crdroidLogo != null) {
+            crdroidLogo.setVisibility(show ? (mCrdroidLogo ? View.VISIBLE : View.GONE) : View.GONE);
+        }
+    }
 
     private BroadcastReceiver mPackageBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
